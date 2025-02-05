@@ -1,16 +1,29 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
+const cors = require('cors');
 require('dotenv').config();
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 const app = express();
 
+// Add CORS and security middleware
+app.use(cors());
 app.use(express.json());
+app.disable('x-powered-by'); // Removes the X-Powered-By header
 
-// Add default route
-app.get('/', (req, res) => {
-  res.send('Server is up and running!');
+// Security headers middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
+// Redirect all traffic from root to a custom message
+app.get('*', (req, res) => {
+  if (req.path === '/api/waitlist') return next();
+  res.status(200).send('Welcome to Expert Ease API');
 });
 
 const validateEmail = (email) => {
