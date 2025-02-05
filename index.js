@@ -8,6 +8,11 @@ const app = express();
 
 app.use(express.json());
 
+// Add default route
+app.get('/', (req, res) => {
+  res.send('Server is up and running!');
+});
+
 const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(String(email).toLowerCase());
